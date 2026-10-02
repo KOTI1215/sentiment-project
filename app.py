@@ -1,30 +1,43 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 import joblib
-import re
 
 app = Flask(__name__)
 
+# Load model and vectorizer
 model = joblib.load('model.pkl')
-vectorizer = joblib.load('vec.pkl')
+vec = joblib.load('vec.pkl')
 
-def clean(text):
-    text = text.lower()
-    text = re.sub(r'[^a-z\s]', '', text)
-    return text
-
-@app.route('/')
-def home():
+@app.route('/', methods=['GET'])
+def index():
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
-    review = clean(data['review'])
-    vec = vectorizer.transform([review])
-    pred = model.predict(vec)[0]
-    prob = model.predict_proba(vec)[0]
-    confidence = float(max(prob)) * 100
-    return jsonify({'sentiment': pred, 'confidence': round(confidence, 1)})
+    # Handle HTML form submission
+    if request.form:
+        text = request.form.get('review', '')
+    # Handle JSON API requests
+    elif request.is_json:
+        data = request.get_json()
+        text = data.get('review', '')
+    else:
+        text = ''
+
+    if not text:
+        return render_template('index.html', error="Please enter a review.")
+
+    # Model prediction
+    text_vec = vec.transform([text])
+    prediction = model.predict(text_vec)[0]
+    probabilities = model.predict_proba(text_vec)[0]
+    confidence = round(max(probabilities) * 100, 1)
+
+    # Return HTML page with results for browser forms
+    if request.form:
+        return render_template('index.html', sentiment=prediction.upper(), confidence=confidence, review=text)
+    
+    # Return JSON for API calls
+    return jsonify({'sentiment': prediction, 'confidence': confidence})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
