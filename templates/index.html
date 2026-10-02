@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Sentiment Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f4f6f9;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; color: #333; }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0056b3; }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+        .positive { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .negative { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🎬 Movie Review Sentiment Analyzer</h2>
+    <textarea id="reviewInput" placeholder="Enter your movie review here..."></textarea>
+    <button onclick="analyzeSentiment()">Analyze Sentiment</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    async function analyzeSentiment() {
+        const reviewText = document.getElementById("reviewInput").value.trim();
+        const resultDiv = document.getElementById("result");
+
+        if (!reviewText) {
+            alert("Please enter a review first!");
+            return;
+        }
+
+        resultDiv.style.display = "none";
+
+        const response = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ review: reviewText })
+        });
+
+        const data = await response.json();
+        const sentiment = data.sentiment;
+        const confidence = data.confidence;
+
+        resultDiv.style.display = "block";
+        resultDiv.className = sentiment === "positive" ? "positive" : "negative";
+        resultDiv.innerHTML = `Sentiment: ${sentiment.toUpperCase()} (${confidence}% confidence)`;
+    }
+</script>
+
+</body>
+</html>
