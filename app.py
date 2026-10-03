@@ -146,11 +146,12 @@ def predict_csv():
 def get_movie_info():
     data = request.get_json()
     movie_name = data.get("movie_name", "").strip()
+    movie_year = data.get("movie_year", "").strip()
 
     if not movie_name:
         return jsonify({"error": "Please enter a movie title"}), 400
 
-    url = f"https://www.omdbapi.com/?t={movie_name}&plot=full&apikey={OMDB_API_KEY}"
+    url = f"https://www.omdbapi.com/?t={movie_name}&y={movie_year}&plot=full&apikey={OMDB_API_KEY}"
     response = requests.get(url)
     movie_data = response.json()
 
@@ -172,7 +173,6 @@ def get_movie_info():
     }
 
     return jsonify(result)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

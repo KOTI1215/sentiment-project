@@ -148,6 +148,11 @@
 
         <div id="movieError" style="display: none; color: red; margin-top: 10px;"></div>
     </div>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <input type="text" id="movieSearchInput" placeholder="Enter movie title (e.g., Rebel)" style="flex: 2; padding: 10px;">
+    <input type="text" id="movieYearInput" placeholder="Year (optional, e.g., 2012)" style="flex: 1; padding: 10px;">
+    <button type="button" class="btn" onclick="fetchMovieData()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+</div>
 
     <!-- JAVASCRIPT SECTION (Single <script> tag) -->
     <script>
@@ -156,46 +161,47 @@
         }
 
         async function fetchMovieData() {
-            const movieName = document.getElementById("movieSearchInput").value.trim();
-            const container = document.getElementById("movieDetailsContainer");
-            const errorDiv = document.getElementById("movieError");
+    const movieName = document.getElementById("movieSearchInput").value.trim();
+    const movieYear = document.getElementById("movieYearInput").value.trim();
+    const container = document.getElementById("movieDetailsContainer");
+    const errorDiv = document.getElementById("movieError");
 
-            container.style.display = "none";
-            errorDiv.style.display = "none";
+    container.style.display = "none";
+    errorDiv.style.display = "none";
 
-            if (!movieName) {
-                errorDiv.innerText = "Please enter a movie title!";
-                errorDiv.style.display = "block";
-                return;
-            }
+    if (!movieName) {
+        errorDiv.innerText = "Please enter a movie title!";
+        errorDiv.style.display = "block";
+        return;
+    }
 
-            try {
-                const response = await fetch("/get-movie-info", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ movie_name: movieName })
-                });
+    try {
+        const response = await fetch("/get-movie-info", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ movie_name: movieName, movie_year: movieYear })
+        });
 
-                const data = await response.json();
+        const data = await response.json();
 
-                if (response.ok) {
-                    document.getElementById("movieTitle").innerText = `${data.title} (${data.year})`;
-                    document.getElementById("moviePoster").src = (data.poster && data.poster !== "N/A") ? data.poster : "https://via.placeholder.com/200x300?text=No+Poster";
-                    document.getElementById("movieRating").innerText = data.imdb_rating || "N/A";
-                    document.getElementById("movieDirector").innerText = data.director || "N/A";
-                    document.getElementById("movieActors").innerText = data.actors || "N/A";
-                    document.getElementById("moviePlot").innerText = data.plot || "";
+        if (response.ok) {
+            document.getElementById("movieTitle").innerText = `${data.title} (${data.year})`;
+            document.getElementById("moviePoster").src = (data.poster && data.poster !== "N/A") ? data.poster : "https://via.placeholder.com/200x300?text=No+Poster";
+            document.getElementById("movieRating").innerText = data.imdb_rating || "N/A";
+            document.getElementById("movieDirector").innerText = data.director || "N/A";
+            document.getElementById("movieActors").innerText = data.actors || "N/A";
+            document.getElementById("moviePlot").innerText = data.plot || "";
 
-                    container.style.display = "block";
-                } else {
-                    errorDiv.innerText = data.error || "Movie not found!";
-                    errorDiv.style.display = "block";
-                }
-            } catch (err) {
-                errorDiv.innerText = "An error occurred while fetching movie details.";
-                errorDiv.style.display = "block";
-            }
+            container.style.display = "block";
+        } else {
+            errorDiv.innerText = data.error || "Movie not found!";
+            errorDiv.style.display = "block";
         }
+    } catch (err) {
+        errorDiv.innerText = "An error occurred while fetching movie details.";
+        errorDiv.style.display = "block";
+    }
+}
     </script>
 </body>
 </html>
