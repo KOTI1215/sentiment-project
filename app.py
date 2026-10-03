@@ -1,7 +1,7 @@
 import http
 from unittest import result
 
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, redirect, render_template, request, jsonify, send_file
 import joblib
 import pandas as pd
 import io
@@ -9,7 +9,6 @@ import sqlite3
 import datetime
 import requests
 
-app = Flask(__name__)
 
 OMDB_API_KEY = "bfcae30c"
 
@@ -36,7 +35,31 @@ def init_db():
     conn.close()
 
 init_db()
+@app.route("/")
+def home():
+    init_db()
+    conn = sqlite3.connect("history.db")
+    cursor = conn.cursor()
+    
+    pos_count = 0
+    neg_count = 0
+    history = []
 
+    try:
+        cursor.execute("SELECT review, sentiment, confidence FROM predictions ORDER BY id DESC LIMIT 5")
+        history = cursor.fetchall()
+
+        cursor.execute("SELECT COUNT(*) FROM predictions WHERE sentiment = 'POSITIVE'")
+        pos_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM predictions WHERE sentiment = 'NEGATIVE'")
+        neg_count = cursor.fetchone()[0]
+    except Exception:
+        history = []
+    finally:
+        conn.close()
+
+    return render_template("index.html", history=history, pos_count=pos_count, neg_count=neg_count)
 def log_prediction(review, sentiment, confidence):
     conn = sqlite3.connect('history.db')
     cursor = conn.cursor()
@@ -173,6 +196,44 @@ def get_movie_info():
     }
 
     return jsonify(result)
+@app.route("/clear-history", methods=["POST"])
+def clear_history():
+    conn = sqlite3.connect("history.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM predictions")
+    conn.commit()
+    conn.close()
+    return redirect("/")
+@app.route("/export-history", methods=["GET"])
+def export_history():
+    conn = sqlite3.connect("history.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT review, sentiment, confidence, timestamp FROM predictions ORDER BY id DESC")
+    rows = cursor.fetchall()
+    conn.close()
 
+    # Generate CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Review", "Sentiment", "Confidence (%)", "Timestamp"])
+    
+    for row in rows:
+        writer.writerow(row)
+
+    output.seek(0)
+    return send_file(
+        io.BytesIO(output.getvalue().encode("utf-8")),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="prediction_history.csv"
+    )
+@app.route("/clear-history", methods=["POST"])
+def clear_history():
+    conn = sqlite3.connect("history.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM predictions")
+    conn.commit()
+    conn.close()
+    return redirect("/")
 if __name__ == "__main__":
     app.run(debug=True)
