@@ -152,6 +152,14 @@
     <input type="text" id="movieSearchInput" placeholder="Enter movie title (e.g., Rebel)" style="flex: 2; padding: 10px;">
     <input type="text" id="movieYearInput" placeholder="Year (optional, e.g., 2012)" style="flex: 1; padding: 10px;">
     <button type="button" class="btn" onclick="fetchMovieData()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+<button type="button" onclick="analyzeMoviePlot()" style="margin-top: 10px; background-color: #17a2b8; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+    📊 Analyze Plot Sentiment
+</button>
+<p><strong>📖 Plot:</strong> <span id="moviePlot"></span></p>
+<!-- ADD THIS BUTTON RIGHT HERE -->
+<button type="button" onclick="analyzeMoviePlot()" style="margin-top: 12px; background-color: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+    📊 Analyze Plot Sentiment
+</button>
 </div>
 
     <!-- JAVASCRIPT SECTION (Single <script> tag) -->
@@ -200,6 +208,22 @@
     } catch (err) {
         errorDiv.innerText = "An error occurred while fetching movie details.";
         errorDiv.style.display = "block";
+    }
+}
+function analyzeMoviePlot() {
+    const plotText = document.getElementById("moviePlot").innerText;
+    if (plotText) {
+        document.getElementById("review").value = plotText;
+        document.getElementById("review").scrollIntoView({ behavior: 'smooth' });
+    }
+}
+function analyzeMoviePlot() {
+    const plotText = document.getElementById("moviePlot").innerText;
+    if (plotText) {
+        const reviewBox = document.getElementById("review");
+        reviewBox.value = plotText;
+        reviewBox.scrollIntoView({ behavior: 'smooth' });
+        reviewBox.focus();
     }
 }
     </script>

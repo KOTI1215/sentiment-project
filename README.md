@@ -31,3 +31,12 @@ A full-stack Natural Language Processing (NLP) web application that predicts mov
    ```bash
    git clone [https://github.com/KOTI1215/sentiment-project.git](https://github.com/KOTI1215/sentiment-project.git)
    cd sentiment-project
+   # 🎬 Movie Review Sentiment & Info Web App
+
+A Flask-based web application that analyzes movie review sentiment using Machine Learning and fetches live movie details via the OMDb API.
+
+## Features
+- **Live Sentiment Prediction:** Classifies review text as Positive or Negative with confidence scoring.
+- **Batch CSV Processing:** Upload bulk review datasets and download predictions.
+- **OMDb Movie Lookup:** Fetches posters, IMDb ratings, directors, cast, and plot details.
+- **Deployment:** Live on Render with environment variable integration.
