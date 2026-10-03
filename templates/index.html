@@ -182,7 +182,9 @@
                 reviewBox.focus();
             }
         }
-    document.addEventListener("DOMContentLoaded", function() {
+    </script>
+        <script>
+document.addEventListener("DOMContentLoaded", function() {
     const chartCanvas = document.getElementById('sentimentChart');
     if (chartCanvas) {
         const posCount = parseInt(chartCanvas.getAttribute('data-pos')) || 0;
@@ -201,7 +203,7 @@
         });
     }
 });
+
     </script>
-    
 </body>
 </html>
