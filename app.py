@@ -196,14 +196,7 @@ def get_movie_info():
     }
 
     return jsonify(result)
-@app.route("/clear-history", methods=["POST"])
-def clear_history():
-    conn = sqlite3.connect("history.db")
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM predictions")
-    conn.commit()
-    conn.close()
-    return redirect("/")
+
 @app.route("/export-history", methods=["GET"])
 def export_history():
     conn = sqlite3.connect("history.db")
