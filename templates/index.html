@@ -96,12 +96,105 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="card mb-4 shadow-sm" style="background-color: #ffffff; border-radius: 10px; padding: 20px;">
+    <h3 class="card-title text-primary">🔍 Search Movie Details</h3>
+    <div class="input-group mb-3" style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="movieSearchInput" class="form-control" placeholder="Enter movie title (e.g., Inception, Avatar)" style="flex: 1; padding: 8px;">
+        <button class="btn btn-primary" onclick="fetchMovieData()" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+    </div>
+
+    <div id="movieDetailsContainer" style="display: none; margin-top: 15px;">
+        <div style="display: flex; gap: 20px;">
+            <div style="text-align: center;">
+                <img id="moviePoster" src="" alt="Movie Poster" style="max-height: 250px; border-radius: 8px;">
+            </div>
+            <div>
+                <h3 id="movieTitle" style="margin-top: 0;"></h3>
+                <p><strong>⭐ IMDb Rating:</strong> <span id="movieRating" style="font-weight: bold; color: #f39c12;"></span>/10</p>
+                <p><strong>🎬 Director:</strong> <span id="movieDirector"></span></p>
+                <p><strong>👥 Cast:</strong> <span id="movieActors"></span></p>
+                <p><strong>📖 Plot:</strong> <span id="moviePlot"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="movieError" style="display: none; color: red; margin-top: 10px;"></div>
+</div>
         {% endif %}
     </div>
 
+       <!-- PASTE HTML CARD HERE (Line 126) -->
+    <div class="card" style="margin-bottom: 20px;">
+        <h3>🔍 Search Movie Details</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="movieSearchInput" placeholder="Enter movie title (e.g., Inception, Avatar)" style="flex: 1; padding: 10px;">
+            <button type="button" class="btn" onclick="fetchMovieData()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+        </div>
+
+        <div id="movieDetailsContainer" style="display: none; margin-top: 15px;">
+            <div style="display: flex; gap: 20px;">
+                <div>
+                    <img id="moviePoster" src="" alt="Movie Poster" style="max-height: 250px; border-radius: 8px;">
+                </div>
+                <div>
+                    <h3 id="movieTitle" style="margin-top: 0;"></h3>
+                    <p><strong>⭐ IMDb Rating:</strong> <span id="movieRating" style="font-weight: bold; color: #f39c12;"></span>/10</p>
+                    <p><strong>🎬 Director:</strong> <span id="movieDirector"></span></p>
+                    <p><strong>👥 Cast:</strong> <span id="movieActors"></span></p>
+                    <p><strong>📖 Plot:</strong> <span id="moviePlot"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="movieError" style="display: none; color: red; margin-top: 10px;"></div>
+    </div>
+
+    <!-- JAVASCRIPT SECTION (Single <script> tag) -->
     <script>
         function setReview(text) {
             document.getElementById('review').value = text;
+        }
+
+        async function fetchMovieData() {
+            const movieName = document.getElementById("movieSearchInput").value.trim();
+            const container = document.getElementById("movieDetailsContainer");
+            const errorDiv = document.getElementById("movieError");
+
+            container.style.display = "none";
+            errorDiv.style.display = "none";
+
+            if (!movieName) {
+                errorDiv.innerText = "Please enter a movie title!";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            try {
+                const response = await fetch("/get-movie-info", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ movie_name: movieName })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("movieTitle").innerText = `${data.title} (${data.year})`;
+                    document.getElementById("moviePoster").src = (data.poster && data.poster !== "N/A") ? data.poster : "https://via.placeholder.com/200x300?text=No+Poster";
+                    document.getElementById("movieRating").innerText = data.imdb_rating || "N/A";
+                    document.getElementById("movieDirector").innerText = data.director || "N/A";
+                    document.getElementById("movieActors").innerText = data.actors || "N/A";
+                    document.getElementById("moviePlot").innerText = data.plot || "";
+
+                    container.style.display = "block";
+                } else {
+                    errorDiv.innerText = data.error || "Movie not found!";
+                    errorDiv.style.display = "block";
+                }
+            } catch (err) {
+                errorDiv.innerText = "An error occurred while fetching movie details.";
+                errorDiv.style.display = "block";
+            }
         }
     </script>
 </body>

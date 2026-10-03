@@ -1,9 +1,17 @@
+import http
+from unittest import result
+
 from flask import Flask, render_template, request, jsonify, send_file
 import joblib
 import pandas as pd
 import io
 import sqlite3
 import datetime
+import requests
+
+app = Flask(__name__)
+
+OMDB_API_KEY = "bfcae30c"
 
 app = Flask(__name__)
 
@@ -134,5 +142,37 @@ def predict_csv():
     except Exception as e:
         return render_template('index.html', error=f"Error processing CSV: {str(e)}", history=history)
 
-if __name__ == '__main__':
+@app.route("/get-movie-info", methods=["POST"])
+def get_movie_info():
+    data = request.get_json()
+    movie_name = data.get("movie_name", "").strip()
+
+    if not movie_name:
+        return jsonify({"error": "Please enter a movie title"}), 400
+
+    url = f"https://www.omdbapi.com/?t={movie_name}&plot=full&apikey={OMDB_API_KEY}"
+    response = requests.get(url)
+    movie_data = response.json()
+
+    if movie_data.get("Response") == "False":
+        return jsonify({"error": "Movie not found!"}), 404
+
+    result = {
+        "title": movie_data.get("Title"),
+        "year": movie_data.get("Year"),
+        "rated": movie_data.get("Rated"),
+        "released": movie_data.get("Released"),
+        "genre": movie_data.get("Genre"),
+        "director": movie_data.get("Director"),
+        "actors": movie_data.get("Actors"),
+        "plot": movie_data.get("Plot"),
+        "poster": movie_data.get("Poster"),
+        "imdb_rating": movie_data.get("imdbRating"),
+        "box_office": movie_data.get("BoxOffice", "N/A"),
+    }
+
+    return jsonify(result)
+
+
+if __name__ == "__main__":
     app.run(debug=True)
