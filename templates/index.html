@@ -10,6 +10,7 @@
         .container { max-width: 900px; margin-top: 30px; margin-bottom: 50px; }
         .card { border-radius: 10px; border: none; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -44,10 +45,18 @@
             </form>
         </div>
 
-        <!-- History Card -->
-        {% if history %}
-        <div class="card p-4 shadow-sm mb-4">
-            <h3>Recent Predictions</h3>
+       <!-- History Card -->
+{% if history %}
+<div class="card p-4 shadow-sm mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Recent Predictions</h3>
+    <div class="d-flex gap-2">
+        <a href="/export-history" class="btn btn-sm btn-outline-primary">📥 Export CSV</a>
+        <form action="/clear-history" method="POST" style="margin: 0;">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Clear History</button>
+        </form>
+    </div>
+</div>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
@@ -108,7 +117,18 @@
             </div>
         </div>
     </div>
-
+<!-- Chart Container -->
+{% if pos_count is defined and (pos_count > 0 or neg_count > 0) %}
+<div class="card p-4 shadow-sm mb-4">
+    <h3>📊 Sentiment Analytics</h3>
+    <div style="max-width: 300px; margin: 0 auto;">
+        <canvas id="sentimentChart" 
+                data-pos="{{ pos_count|default(0) }}" 
+                data-neg="{{ neg_count|default(0) }}">
+        </canvas>
+    </div>
+</div>
+{% endif %}
     <script>
         async function fetchMovieData() {
             const movieName = document.getElementById("movieSearchInput").value.trim();
@@ -162,6 +182,44 @@
                 reviewBox.focus();
             }
         }
+    document.addEventListener("DOMContentLoaded", function() {
+    const chartCanvas = document.getElementById('sentimentChart');
+    if (chartCanvas) {
+        const posCount = parseInt(chartCanvas.getAttribute('data-pos')) || 0;
+        const negCount = parseInt(chartCanvas.getAttribute('data-neg')) || 0;
+
+        const ctx = chartCanvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Negative'],
+                datasets: [{
+                    data: [posCount, negCount],
+                    backgroundColor: ['#198754', '#dc3545']
+                }]
+            }
+        });
+    }
+});
     </script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const chartCanvas = document.getElementById('sentimentChart');
+    if (chartCanvas) {
+        const posCount = parseInt(chartCanvas.getAttribute('data-pos')) || 0;
+        const negCount = parseInt(chartCanvas.getAttribute('data-neg')) || 0;
+
+        const ctx = chartCanvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Positive', 'Negative'],
+                datasets: [{
+                    data: [posCount, negCount],
+                    backgroundColor: ['#198754', '#dc3545']
+                }]
+            }
+        });
+    }
+});
 </body>
 </html>
