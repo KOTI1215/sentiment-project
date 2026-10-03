@@ -3,41 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Sentiment Analyzer</title>
+    <title>Movie Review Sentiment Analyzer</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h1 { text-align: center; color: #333; margin-bottom: 1.5rem; font-size: 1.6rem; }
-        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; resize: vertical; }
-        button { width: 100%; padding: 12px; background: #0066cc; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        button:hover { background: #0052a3; }
-        .samples { display: flex; gap: 8px; margin: 10px 0; }
-        .sample-btn { background: #eef2f5; color: #444; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #ddd; cursor: pointer; flex: 1; text-align: center; }
-        .sample-btn:hover { background: #e2e8f0; }
-        .result { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.1rem; }
-        .positive { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .negative { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h1 { margin-top: 0; color: #333; text-align: center; }
+        textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; resize: none; font-size: 14px; }
+        .btn-group { display: flex; gap: 10px; margin: 10px 0; }
+        .btn-sample { flex: 1; padding: 8px; background: #e9ecef; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .btn-sample:hover { background: #dee2e6; }
+        .btn-submit { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn-submit:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 18px; }
+        .POSITIVE { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .NEGATIVE { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .error { color: red; text-align: center; margin-top: 10px; }
+        hr { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
+        .csv-section { text-align: center; }
+        .csv-input { margin: 15px 0; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>🎬 Movie Review Sentiment</h1>
-        <form method="POST" action="/predict">
-            <textarea name="review" id="review" placeholder="Type or paste a movie review here..." required>{{ review if review else '' }}</textarea>
+        
+        <!-- Single Prediction Form -->
+        <form action="/predict" method="POST">
+            <textarea id="review" name="review" placeholder="Type or paste a movie review here...">{{ review if review else '' }}</textarea>
             
-            <div class="samples">
-                <span class="sample-btn" onclick="setReview('Masterpiece! Brilliant acting and incredible visuals.')">Try Positive</span>
-                <span class="sample-btn" onclick="setReview('Terrible movie. Boring plot and terrible acting.')">Try Negative</span>
+            <div class="btn-group">
+                <button type="button" class="btn-sample" onclick="setReview('This movie was absolute perfection! Great acting and story.')">Try Positive</button>
+                <button type="button" class="btn-sample" onclick="setReview('Complete waste of time. The plot was boring and slow.')">Try Negative</button>
             </div>
 
-            <button type="submit">Analyze Sentiment</button>
+            <button type="submit" class="btn-submit">Analyze Sentiment</button>
         </form>
 
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
         {% if sentiment %}
-            <div class="result {{ 'positive' if sentiment == 'POSITIVE' else 'negative' }}">
-                Sentiment: {{ sentiment }} ({{ confidence }}% confidence)
+            <div class="result {{ sentiment }}">
+                Sentiment: {{ sentiment }}<br>
+                <small style="font-weight: normal; font-size: 14px;">Confidence: {{ confidence }}%</small>
             </div>
         {% endif %}
+
+        <hr>
+
+        <!-- CSV Batch Processing Section -->
+        <div class="csv-section">
+            <h3>📂 Batch Processing (CSV)</h3>
+            <p style="font-size: 13px; color: #666;">Upload a CSV file containing a <b>'review'</b> or <b>'text'</b> column to analyze in bulk.</p>
+            <form action="/predict-csv" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".csv" required class="csv-input"><br>
+                <button type="submit" class="btn-submit" style="background: #28a745;">Upload & Download Results</button>
+            </form>
+        </div>
     </div>
 
     <script>
