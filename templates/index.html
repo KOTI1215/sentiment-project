@@ -6,7 +6,7 @@
     <title>Movie Review Sentiment Analyzer</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
         h1 { margin-top: 0; color: #333; text-align: center; }
         textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; resize: none; font-size: 14px; }
         .btn-group { display: flex; gap: 10px; margin: 10px 0; }
@@ -21,6 +21,14 @@
         hr { margin: 30px 0; border: 0; border-top: 1px solid #eee; }
         .csv-section { text-align: center; }
         .csv-input { margin: 15px 0; }
+        
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #333; }
+        .tag { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .tag-POS { background: #d4edda; color: #155724; }
+        .tag-NEG { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -61,6 +69,34 @@
                 <button type="submit" class="btn-submit" style="background: #28a745;">Upload & Download Results</button>
             </form>
         </div>
+
+        <!-- Prediction History Section -->
+        {% if history %}
+            <hr>
+            <h3>📜 Recent Predictions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Review</th>
+                        <th>Sentiment</th>
+                        <th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                        <tr>
+                            <td>{{ item[0][:35] }}{% if item[0]|length > 35 %}...{% endif %}</td>
+                            <td>
+                                <span class="tag {% if item[1] == 'POSITIVE' %}tag-POS{% else %}tag-NEG{% endif %}">
+                                    {{ item[1] }}
+                                </span>
+                            </td>
+                            <td>{{ item[2] }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 
     <script>
