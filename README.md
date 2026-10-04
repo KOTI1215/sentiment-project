@@ -1,42 +1,33 @@
-# 🎬 Movie Review Sentiment Analysis Application
+# Full-Stack Movie Review Sentiment Analysis Web Application
 
-A full-stack Natural Language Processing (NLP) web application that predicts movie review sentiment (Positive/Negative) with real-time confidence scores, batch CSV processing, and query history logging.
+A production-ready, full-stack machine learning web application that classifies movie reviews into **Positive** or **Negative** sentiments, integrates movie metadata via the OMDb API, provides batch CSV processing, and logs prediction history in an SQLite database.
 
-🚀 **Live Web App:** [https://sentiment-project-3t3x.onrender.com](https://sentiment-project-3t3x.onrender.com)
-
----
-
-## 📌 Features
-
-- **Real-Time Sentiment Prediction:** Instant sentiment analysis with confidence percentage scoring.
-- **Batch CSV Processing:** Upload a CSV file containing reviews to process in bulk and download structured predictions.
-- **Prediction History Log:** Embedded SQLite database to track and render recent predictions on the dashboard.
-- **Dual Support:** Serves both interactive HTML web forms and JSON API endpoints.
-- **Interactive UI:** Pre-loaded test samples and dynamic result styling.
-
----
+## 🚀 Live Demo
+* **Live Application:** [https://sentiment-project-3t3x.onrender.com](https://sentiment-project-3t3x.onrender.com)
 
 ## 🛠️ Tech Stack
+* **Backend:** Python, Flask, Scikit-Learn
+* **Database:** SQLite
+* **Frontend:** HTML5, CSS3, Bootstrap, Chart.js
+* **External APIs:** OMDb API (Open Movie Database)
+* **Version Control & Hosting:** Git, GitHub, Render (CI/CD)
 
-- **Backend:** Python, Flask, SQLite3
-- **Machine Learning & NLP:** Scikit-Learn (TF-IDF Bigrams + Logistic Regression), Pandas, Joblib
-- **Frontend:** HTML5, CSS3, Jinja2
-- **Deployment & Tooling:** Render, Git, GitHub, Gunicorn
+## ✨ Key Features
+* **Single-Text Prediction:** Real-time sentiment analysis with confidence percentage scoring.
+* **Batch CSV Processing:** Upload a CSV of reviews and instantly download predicted results.
+* **Database Logging:** Stores all prediction history locally via SQLite.
+* **Interactive Analytics:** Visualizes sentiment breakdown using Chart.js.
+* **Movie Metadata Lookup:** Fetches posters, plots, and ratings dynamically using the OMDb API.
+* **Data Management:** Export history to CSV or clear logs with a single click.
 
----
-
-## 🏃 Local Setup Instructions
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/KOTI1215/sentiment-project.git](https://github.com/KOTI1215/sentiment-project.git)
-   cd sentiment-project
-   # 🎬 Movie Review Sentiment & Info Web App
-
-A Flask-based web application that analyzes movie review sentiment using Machine Learning and fetches live movie details via the OMDb API.
-
-## Features
-- **Live Sentiment Prediction:** Classifies review text as Positive or Negative with confidence scoring.
-- **Batch CSV Processing:** Upload bulk review datasets and download predictions.
-- **OMDb Movie Lookup:** Fetches posters, IMDb ratings, directors, cast, and plot details.
-- **Deployment:** Live on Render with environment variable integration.
+## 📦 Project Structure
+sentiment-project/
+│
+├── app.py              # Main Flask application & routes
+├── model.pkl           # Trained Scikit-Learn ML model
+├── vec.pkl             # TF-IDF Vectorizer
+├── history.db          # SQLite database for prediction logs
+├── requirements.txt    # Python dependencies
+├── Procfile            # Render deployment configuration
+└── templates/
+    └── index.html      # Frontend user interface
